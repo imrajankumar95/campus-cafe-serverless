@@ -1,0 +1,7 @@
+# Normalize line endings; Azure Functions runs on Linux
+* text=auto
+*.sh text eol=lf
+*.py text eol=lf
+*.bicep text eol=lf
+*.pdf binary
+*.png binary

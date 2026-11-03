@@ -1,0 +1,42 @@
+# --- Local-only material (never commit) ---
+_reference/
+*.zip
+
+# --- Secrets and keys ---
+local.settings.json
+.env
+*.env
+*.pem
+*.pfx
+*.key
+
+# --- Python ---
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# --- Azure Functions ---
+.python_packages/
+bin/
+obj/
+
+# --- Azurite (local storage emulator) ---
+__azurite_db*__.json
+__blobstorage__/
+__queuestorage__/
+.azurite/
+
+# --- Bicep build output (keep parameter files) ---
+infra/**/*.json
+!infra/**/*.parameters.json
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+desktop.ini
