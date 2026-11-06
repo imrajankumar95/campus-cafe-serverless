@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your order · Campus Café</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">☕</span><span class="brand-name">Campus Café</span></a>
+      <nav class="nav" aria-label="Main">
+        <a href="index.html">Home</a>
+        <a href="menu.html">Menu</a>
+        <a href="order.html" class="nav-cart" aria-current="page">Order <span id="cart-count" class="badge" hidden>0</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="page-head">
+      <h1>Your order</h1>
+      <p>Check your items, tell us who it's for, and we'll take it from there.</p>
+    </section>
+
+    <!-- Shown while building the order -->
+    <div id="order-view" class="order-layout">
+      <section class="panel" aria-labelledby="items-title">
+        <h2 id="items-title">Items</h2>
+        <ul id="cart-items" class="cart-items" aria-live="polite"></ul>
+        <div id="cart-empty" class="empty" hidden>
+          <div class="empty-emoji" aria-hidden="true">🛒</div>
+          <p>Your order is empty.</p>
+          <a class="btn btn-primary" href="menu.html">Browse the menu</a>
+        </div>
+      </section>
+
+      <aside class="panel" aria-labelledby="checkout-title">
+        <h2 id="checkout-title">Checkout</h2>
+        <div class="summary-row muted"><span>Items</span><span id="summary-count">0</span></div>
+        <div class="summary-row summary-total"><span>Total</span><span id="summary-total">$0.00</span></div>
+        <p class="hint">Pay at the counter when you pick up.</p>
+
+        <form id="order-form" class="form" novalidate>
+          <label for="pickup-name">Name for pickup</label>
+          <input id="pickup-name" name="pickupName" type="text" maxlength="40" autocomplete="given-name" required>
+
+          <label for="email">Email for updates</label>
+          <input id="email" name="email" type="email" maxlength="100" autocomplete="email" required>
+          <span class="hint">Only used to email you when your order moves forward.</span>
+
+          <button id="place-order" class="btn btn-primary btn-block" type="submit" disabled>Place order</button>
+          <p id="order-message" class="message" role="status"></p>
+        </form>
+      </aside>
+    </div>
+
+    <!-- Shown after the order is placed -->
+    <section id="confirm-view" class="panel confirm" hidden aria-live="polite">
+      <div class="confirm-emoji" aria-hidden="true">🎉</div>
+      <h2>Order placed!</h2>
+      <p id="confirm-text" class="muted"></p>
+      <div id="confirm-id" class="order-id"></div>
+      <div><a class="btn btn-ghost" href="menu.html">Order something else</a></div>
+    </section>
+
+    <section id="track" class="section" aria-labelledby="track-title">
+      <div class="panel">
+        <h2 id="track-title">Track an order</h2>
+        <form id="track-form" class="track-form">
+          <label for="order-id" class="visually-hidden">Order ID</label>
+          <input id="order-id" name="orderId" type="text" placeholder="Paste your order ID" required>
+          <button class="btn btn-primary" type="submit">Check status</button>
+        </form>
+        <p id="track-message" class="message" role="status"></p>
+        <ol id="status-steps" class="status-steps" hidden>
+          <li data-status="Accepted">Accepted</li>
+          <li data-status="Preparing">Preparing</li>
+          <li data-status="Ready">Ready</li>
+          <li data-status="Collected">Collected</li>
+        </ol>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <span>☕ Campus Café</span>
+      <span>Mon–Fri 7 AM–7 PM · Pickup only · Pay at the counter</span>
+    </div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="menu.js"></script>
+  <script src="cart.js"></script>
+  <script src="order-page.js"></script>
+</body>
+</html>
