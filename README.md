@@ -24,7 +24,7 @@ Customers order online and get an email each time staff move the order forward: 
 ```
 src/        Azure Functions app (Python)
 infra/      Bicep templates
-web/        Customer, status and staff pages
+frontend/   Customer pages: home, menu, order + tracking (vanilla JS)
 docs/       Design, ADRs, API contract, runbooks, retros
 evidence/   Screenshots proving each sprint's work
 .github/    Workflows, issue and PR templates

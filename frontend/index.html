@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Campus Café</title>
+  <meta name="description" content="Order ahead at the Campus Café and get an email when your order is ready.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">☕</span><span class="brand-name">Campus Café</span></a>
+      <nav class="nav" aria-label="Main">
+        <a href="index.html" aria-current="page">Home</a>
+        <a href="menu.html">Menu</a>
+        <a href="order.html" class="nav-cart">Order <span id="cart-count" class="badge" hidden>0</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <p class="hero-eyebrow">Fresh on campus</p>
+        <h1>Order ahead.<br>Skip the line.</h1>
+        <p>Pick your coffee and snacks, place the order in seconds, and we'll email you the moment it's ready for pickup.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="menu.html">Browse the menu</a>
+          <a class="btn btn-ghost" href="order.html#track">Track an order</a>
+        </div>
+      </div>
+      <div class="hero-art" aria-hidden="true">☕</div>
+    </section>
+
+    <section class="section" aria-labelledby="categories-title">
+      <div class="section-head">
+        <div>
+          <h2 id="categories-title">What we serve</h2>
+          <p class="muted">Three simple categories. Everything made to order.</p>
+        </div>
+        <a class="btn btn-ghost" href="menu.html">Full menu →</a>
+      </div>
+      <div id="category-grid" class="category-grid"></div>
+    </section>
+
+    <section class="section" aria-labelledby="how-title">
+      <div class="section-head">
+        <h2 id="how-title">How it works</h2>
+      </div>
+      <ol class="steps">
+        <li><strong>Pick</strong><span class="muted">Add drinks and food from the menu.</span></li>
+        <li><strong>Order</strong><span class="muted">Enter your name and email. No account needed.</span></li>
+        <li><strong>Get notified</strong><span class="muted">We email you when it's accepted, preparing and ready.</span></li>
+        <li><strong>Pick up</strong><span class="muted">Grab it at the counter and pay there.</span></li>
+      </ol>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <span>☕ Campus Café</span>
+      <span>Mon–Fri 7 AM–7 PM · Pickup only · Pay at the counter</span>
+    </div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="menu.js"></script>
+  <script src="cart.js"></script>
+  <script src="home.js"></script>
+</body>
+</html>
