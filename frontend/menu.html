@@ -4,41 +4,58 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Menu · Campus Café</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="site-header">
     <div class="wrap header-inner">
-      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">☕</span><span class="brand-name">Campus Café</span></a>
+      <a class="brand" href="index.html"><span class="brand-mark"><i data-lucide="coffee"></i></span><span class="brand-name">Campus Café</span></a>
       <nav class="nav" aria-label="Main">
-        <a href="index.html">Home</a>
-        <a href="menu.html" aria-current="page">Menu</a>
-        <a href="order.html" class="nav-cart">Order <span id="cart-count" class="badge" hidden>0</span></a>
+        <a href="index.html"><i data-lucide="house"></i><span class="nav-label">Home</span></a>
+        <a href="menu.html" aria-current="page"><i data-lucide="book-open"></i><span class="nav-label">Menu</span></a>
+        <a href="order.html"><i data-lucide="shopping-bag"></i><span class="nav-label">Order</span> <span id="cart-count" class="badge" hidden>0</span></a>
       </nav>
     </div>
   </header>
 
   <main class="wrap">
     <section class="page-head">
-      <h1>Menu</h1>
-      <p>Tap <strong>Add</strong> on anything you like. Review and place your order on the next page.</p>
+      <h1>Our menu</h1>
+      <p>Tap <strong>Add</strong> on anything you like, then review your order on the next page.</p>
     </section>
 
     <div id="tabs" class="tabs" role="tablist" aria-label="Menu categories"></div>
     <ul id="menu-grid" class="menu-grid" role="tabpanel"></ul>
 
     <div id="sticky-cta" class="sticky-cta" hidden>
-      <a class="btn btn-primary" href="order.html" id="cta-link">Review order</a>
+      <a class="btn btn-primary" href="order.html"><i data-lucide="shopping-bag"></i> <span id="cta-text">Review order</span></a>
     </div>
   </main>
 
   <footer class="site-footer">
     <div class="wrap footer-inner">
-      <span>☕ Campus Café</span>
-      <span>Mon–Fri 7 AM–7 PM · Pickup only · Pay at the counter</span>
+      <div>
+        <div class="footer-brand"><i data-lucide="coffee"></i> Campus Café</div>
+        <p><i data-lucide="clock"></i> Mon–Fri · 7 AM – 7 PM</p>
+        <p><i data-lucide="map-pin"></i> Pickup only · Pay at the counter</p>
+      </div>
+      <div class="powered">
+        <div class="powered-title">Powered by Azure</div>
+        <div class="chips">
+          <span class="chip"><i data-lucide="zap"></i> Functions</span>
+          <span class="chip"><i data-lucide="database"></i> Table Storage</span>
+          <span class="chip"><i data-lucide="list-ordered"></i> Queue</span>
+          <span class="chip"><i data-lucide="mail"></i> Communication Services</span>
+        </div>
+        <a class="footer-link" href="https://github.com/imrajankumar95/campus-cafe-serverless" target="_blank" rel="noopener"><i data-lucide="github"></i> View source on GitHub</a>
+      </div>
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
   <script src="config.js"></script>
   <script src="menu.js"></script>
   <script src="cart.js"></script>

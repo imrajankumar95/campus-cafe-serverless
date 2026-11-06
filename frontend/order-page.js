@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  const { el, money, byId, getCart, changeQty, clearCart, count, total, apiBase, MAX_QTY } = window.Cafe;
+  const { el, icon, refreshIcons, money, byId, getCart, changeQty, clearCart, count, total, apiBase, MAX_QTY } = window.Cafe;
   const $ = (id) => document.getElementById(id);
   const STATUSES = ["Accepted", "Preparing", "Ready", "Collected"];
 
@@ -17,13 +17,13 @@
 
     for (const [id, qty] of Object.entries(cart)) {
       const item = byId.get(id);
-      const minus = qtyButton("−", "Remove one " + item.name, () => update(id, -1));
-      const plus = qtyButton("+", "Add one " + item.name, () => update(id, 1));
+      const minus = qtyButton(qty === 1 ? "trash-2" : "minus", "Remove one " + item.name, () => update(id, -1));
+      const plus = qtyButton("plus", "Add one " + item.name, () => update(id, 1));
       plus.disabled = qty >= MAX_QTY;
 
       list.append(
-        el("li", { className: "cart-row" },
-          el("span", { className: "cart-emoji", ariaHidden: "true", textContent: item.emoji }),
+        el("li", { className: "cart-row tone-" + item.category },
+          el("span", { className: "icon-bubble" }, icon(item.icon)),
           el("div", {},
             el("div", { className: "cart-name", textContent: item.name }),
             el("div", { className: "cart-unit", textContent: money(item.price) + " each" })
@@ -39,10 +39,11 @@
     $("summary-count").textContent = count();
     $("summary-total").textContent = money(total());
     $("place-order").disabled = empty;
+    refreshIcons();
   }
 
-  function qtyButton(label, ariaLabel, onClick) {
-    const b = el("button", { className: "btn-qty", type: "button", textContent: label });
+  function qtyButton(iconName, ariaLabel, onClick) {
+    const b = el("button", { className: "btn-qty", type: "button" }, icon(iconName));
     b.setAttribute("aria-label", ariaLabel);
     b.addEventListener("click", onClick);
     return b;
@@ -107,11 +108,12 @@
   }
 
   // ---------- Track order ----------
-  function showSteps(status) {
+  function showTimeline(status) {
     const reached = STATUSES.indexOf(status);
-    $("status-steps").hidden = reached < 0;
-    document.querySelectorAll("#status-steps li").forEach((li, i) => {
+    $("timeline").hidden = reached < 0;
+    document.querySelectorAll("#timeline li").forEach((li, i) => {
       li.classList.toggle("done", i <= reached);
+      li.classList.toggle("current", i === reached);
     });
   }
 
@@ -123,19 +125,19 @@
 
     const api = apiBase();
     if (!api) {
-      showMessage(msg, "Demo mode: status lookup works once the API is connected. Sample view below.");
-      return showSteps("Preparing");
+      showMessage(msg, "Demo mode: live status works once the API is connected. Sample view below.");
+      return showTimeline("Preparing");
     }
 
     showMessage(msg, "Checking…");
-    showSteps(null);
+    showTimeline(null);
     try {
       const res = await fetch(api + "/api/orders/" + encodeURIComponent(orderId));
       if (res.status === 404) return showMessage(msg, "No order found with that ID.", "error");
       if (!res.ok) throw new Error("Could not check the order right now.");
       const body = await res.json();
       showMessage(msg, "Status: " + body.status, "success");
-      showSteps(body.status);
+      showTimeline(body.status);
     } catch (err) {
       showMessage(msg, err.message, "error");
     }

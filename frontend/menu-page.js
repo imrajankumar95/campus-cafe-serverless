@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  const { el, money, changeQty, getCart, count, total, toast, MAX_QTY } = window.Cafe;
+  const { el, icon, refreshIcons, money, changeQty, getCart, count, total, toast, MAX_QTY } = window.Cafe;
   const categories = window.CAFE_CATEGORIES;
 
   // Start on the category from the URL (menu.html?category=cold), else the first one.
@@ -11,14 +11,13 @@
     const tabs = document.getElementById("tabs");
     tabs.replaceChildren();
     for (const cat of categories) {
-      const tab = el("button", { className: "tab", type: "button", textContent: cat.emoji + " " + cat.name });
+      const tab = el("button", { className: "tab tone-" + cat.id, type: "button" }, icon(cat.icon), cat.name);
       tab.setAttribute("role", "tab");
       tab.setAttribute("aria-selected", String(cat.id === active));
       tab.addEventListener("click", () => {
         active = cat.id;
         history.replaceState(null, "", "?category=" + cat.id);
-        renderTabs();
-        renderMenu();
+        render();
       });
       tabs.append(tab);
     }
@@ -31,24 +30,24 @@
 
     window.CAFE_MENU.filter((item) => item.category === active).forEach((item, i) => {
       const inCart = cart[item.id] || 0;
-      const add = el("button", { className: "btn-add", type: "button", textContent: "Add" });
+      const add = el("button", { className: "btn-add", type: "button" }, icon("plus"), "Add");
       add.setAttribute("aria-label", "Add " + item.name);
       add.disabled = inCart >= MAX_QTY;
       add.addEventListener("click", () => {
         changeQty(item.id, 1);
-        toast(item.emoji + " " + item.name + " added");
-        renderMenu();
-        renderCta();
+        toast(item.name + " added");
+        render();
       });
 
-      const card = el("li", { className: "menu-card" },
-        el("div", { className: "item-emoji", ariaHidden: "true", textContent: item.emoji }),
+      const card = el("li", { className: "menu-card tone-" + item.category },
+        item.popular ? el("span", { className: "tag-popular" }, icon("star"), "Popular") : "",
+        el("span", { className: "icon-bubble" }, icon(item.icon)),
         el("h3", { textContent: item.name }),
         el("p", { textContent: item.description }),
         el("div", { className: "card-row" },
-          el("span", {},
+          el("div", {},
             el("span", { className: "price", textContent: money(item.price) }),
-            inCart ? el("span", { className: "in-cart", textContent: "  · " + inCart + " in order" }) : ""
+            inCart ? el("span", { className: "in-cart", textContent: inCart + " in your order" }) : ""
           ),
           add
         )
@@ -61,11 +60,16 @@
   function renderCta() {
     const n = count();
     document.getElementById("sticky-cta").hidden = n === 0;
-    document.getElementById("cta-link").textContent =
+    document.getElementById("cta-text").textContent =
       "Review order · " + n + (n === 1 ? " item" : " items") + " · " + money(total());
   }
 
-  renderTabs();
-  renderMenu();
-  renderCta();
+  function render() {
+    renderTabs();
+    renderMenu();
+    renderCta();
+    refreshIcons();
+  }
+
+  render();
 })();

@@ -4,16 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Your order · Campus Café</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="site-header">
     <div class="wrap header-inner">
-      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">☕</span><span class="brand-name">Campus Café</span></a>
+      <a class="brand" href="index.html"><span class="brand-mark"><i data-lucide="coffee"></i></span><span class="brand-name">Campus Café</span></a>
       <nav class="nav" aria-label="Main">
-        <a href="index.html">Home</a>
-        <a href="menu.html">Menu</a>
-        <a href="order.html" class="nav-cart" aria-current="page">Order <span id="cart-count" class="badge" hidden>0</span></a>
+        <a href="index.html"><i data-lucide="house"></i><span class="nav-label">Home</span></a>
+        <a href="menu.html"><i data-lucide="book-open"></i><span class="nav-label">Menu</span></a>
+        <a href="order.html" aria-current="page"><i data-lucide="shopping-bag"></i><span class="nav-label">Order</span> <span id="cart-count" class="badge" hidden>0</span></a>
       </nav>
     </div>
   </header>
@@ -27,30 +30,34 @@
     <!-- Shown while building the order -->
     <div id="order-view" class="order-layout">
       <section class="panel" aria-labelledby="items-title">
-        <h2 id="items-title">Items</h2>
+        <h2 id="items-title"><i data-lucide="shopping-bag"></i> Items</h2>
         <ul id="cart-items" class="cart-items" aria-live="polite"></ul>
         <div id="cart-empty" class="empty" hidden>
-          <div class="empty-emoji" aria-hidden="true">🛒</div>
+          <span class="icon-bubble"><i data-lucide="shopping-basket"></i></span>
           <p>Your order is empty.</p>
-          <a class="btn btn-primary" href="menu.html">Browse the menu</a>
+          <a class="btn btn-primary" href="menu.html"><i data-lucide="book-open"></i> Browse the menu</a>
         </div>
       </section>
 
       <aside class="panel" aria-labelledby="checkout-title">
-        <h2 id="checkout-title">Checkout</h2>
+        <h2 id="checkout-title"><i data-lucide="receipt"></i> Checkout</h2>
         <div class="summary-row muted"><span>Items</span><span id="summary-count">0</span></div>
         <div class="summary-row summary-total"><span>Total</span><span id="summary-total">$0.00</span></div>
-        <p class="hint">Pay at the counter when you pick up.</p>
+        <p class="hint"><i data-lucide="wallet"></i> Pay at the counter when you pick up.</p>
 
         <form id="order-form" class="form" novalidate>
           <label for="pickup-name">Name for pickup</label>
-          <input id="pickup-name" name="pickupName" type="text" maxlength="40" autocomplete="given-name" required>
+          <div class="input-wrap"><i data-lucide="user"></i>
+            <input id="pickup-name" name="pickupName" type="text" maxlength="40" autocomplete="given-name" placeholder="e.g. Sam" required>
+          </div>
 
           <label for="email">Email for updates</label>
-          <input id="email" name="email" type="email" maxlength="100" autocomplete="email" required>
-          <span class="hint">Only used to email you when your order moves forward.</span>
+          <div class="input-wrap"><i data-lucide="mail"></i>
+            <input id="email" name="email" type="email" maxlength="100" autocomplete="email" placeholder="you@georgebrown.ca" required>
+          </div>
+          <span class="hint"><i data-lucide="shield-check"></i> Only used to email you about this order.</span>
 
-          <button id="place-order" class="btn btn-primary btn-block" type="submit" disabled>Place order</button>
+          <button id="place-order" class="btn btn-primary btn-block" type="submit" disabled><i data-lucide="send"></i> Place order</button>
           <p id="order-message" class="message" role="status"></p>
         </form>
       </aside>
@@ -58,27 +65,29 @@
 
     <!-- Shown after the order is placed -->
     <section id="confirm-view" class="panel confirm" hidden aria-live="polite">
-      <div class="confirm-emoji" aria-hidden="true">🎉</div>
+      <span class="icon-bubble"><i data-lucide="party-popper"></i></span>
       <h2>Order placed!</h2>
       <p id="confirm-text" class="muted"></p>
       <div id="confirm-id" class="order-id"></div>
-      <div><a class="btn btn-ghost" href="menu.html">Order something else</a></div>
+      <div><a class="btn btn-ghost" href="menu.html"><i data-lucide="plus"></i> Order something else</a></div>
     </section>
 
     <section id="track" class="section" aria-labelledby="track-title">
       <div class="panel">
-        <h2 id="track-title">Track an order</h2>
+        <h2 id="track-title"><i data-lucide="search"></i> Track an order</h2>
         <form id="track-form" class="track-form">
           <label for="order-id" class="visually-hidden">Order ID</label>
-          <input id="order-id" name="orderId" type="text" placeholder="Paste your order ID" required>
+          <div class="input-wrap"><i data-lucide="hash"></i>
+            <input id="order-id" name="orderId" type="text" placeholder="Paste your order ID" required>
+          </div>
           <button class="btn btn-primary" type="submit">Check status</button>
         </form>
         <p id="track-message" class="message" role="status"></p>
-        <ol id="status-steps" class="status-steps" hidden>
-          <li data-status="Accepted">Accepted</li>
-          <li data-status="Preparing">Preparing</li>
-          <li data-status="Ready">Ready</li>
-          <li data-status="Collected">Collected</li>
+        <ol id="timeline" class="timeline" hidden>
+          <li><span class="dot"><i data-lucide="clipboard-check"></i></span>Accepted</li>
+          <li><span class="dot"><i data-lucide="chef-hat"></i></span>Preparing</li>
+          <li><span class="dot"><i data-lucide="bell-ring"></i></span>Ready</li>
+          <li><span class="dot"><i data-lucide="package-check"></i></span>Collected</li>
         </ol>
       </div>
     </section>
@@ -86,11 +95,25 @@
 
   <footer class="site-footer">
     <div class="wrap footer-inner">
-      <span>☕ Campus Café</span>
-      <span>Mon–Fri 7 AM–7 PM · Pickup only · Pay at the counter</span>
+      <div>
+        <div class="footer-brand"><i data-lucide="coffee"></i> Campus Café</div>
+        <p><i data-lucide="clock"></i> Mon–Fri · 7 AM – 7 PM</p>
+        <p><i data-lucide="map-pin"></i> Pickup only · Pay at the counter</p>
+      </div>
+      <div class="powered">
+        <div class="powered-title">Powered by Azure</div>
+        <div class="chips">
+          <span class="chip"><i data-lucide="zap"></i> Functions</span>
+          <span class="chip"><i data-lucide="database"></i> Table Storage</span>
+          <span class="chip"><i data-lucide="list-ordered"></i> Queue</span>
+          <span class="chip"><i data-lucide="mail"></i> Communication Services</span>
+        </div>
+        <a class="footer-link" href="https://github.com/imrajankumar95/campus-cafe-serverless" target="_blank" rel="noopener"><i data-lucide="github"></i> View source on GitHub</a>
+      </div>
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
   <script src="config.js"></script>
   <script src="menu.js"></script>
   <script src="cart.js"></script>

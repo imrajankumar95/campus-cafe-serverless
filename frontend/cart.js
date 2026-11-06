@@ -1,4 +1,4 @@
-// Shared by all pages: cart storage, header badge, toast, small helpers.
+// Shared by all pages: cart storage, header badge, toast, icons, small helpers.
 window.Cafe = (function () {
   "use strict";
 
@@ -55,18 +55,17 @@ window.Cafe = (function () {
 
   let toastTimer;
   function toast(text) {
-    let el = document.getElementById("toast");
-    if (!el) {
-      el = document.createElement("div");
-      el.id = "toast";
-      el.className = "toast";
-      el.setAttribute("role", "status");
-      document.body.append(el);
+    let node = document.getElementById("toast");
+    if (!node) {
+      node = el("div", { id: "toast", className: "toast" });
+      node.setAttribute("role", "status");
+      document.body.append(node);
     }
-    el.textContent = text;
-    el.classList.add("show");
+    node.replaceChildren(icon("circle-check"), el("span", { textContent: text }));
+    refreshIcons();
+    node.classList.add("show");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove("show"), 1800);
+    toastTimer = setTimeout(() => node.classList.remove("show"), 1800);
   }
 
   // Tiny element builder: el("p", { className: "muted" }, "text", child)
@@ -77,10 +76,24 @@ window.Cafe = (function () {
     return node;
   }
 
+  // Lucide icon placeholder; refreshIcons() swaps placeholders for SVGs.
+  function icon(name, className) {
+    const node = el("i", { className: "icon" + (className ? " " + className : "") });
+    node.dataset.lucide = name;
+    node.setAttribute("aria-hidden", "true");
+    return node;
+  }
+  function refreshIcons() {
+    if (window.lucide) window.lucide.createIcons();
+  }
+
   const money = (n) => "$" + n.toFixed(2);
   const apiBase = () => (window.CAFE_CONFIG.apiBaseUrl || "").replace(/\/$/, "");
 
-  document.addEventListener("DOMContentLoaded", updateBadge);
+  document.addEventListener("DOMContentLoaded", () => {
+    updateBadge();
+    refreshIcons();
+  });
 
-  return { MAX_QTY, byId, getCart, changeQty, clearCart, count, total, toast, el, money, apiBase };
+  return { MAX_QTY, byId, getCart, changeQty, clearCart, count, total, toast, el, icon, refreshIcons, money, apiBase };
 })();
