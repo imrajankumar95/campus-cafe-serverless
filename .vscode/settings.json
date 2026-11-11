@@ -1,0 +1,12 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/src/.venv/Scripts/python.exe",
+  "pylint.interpreter": ["${workspaceFolder}/src/.venv/Scripts/python.exe"],
+  "azureFunctions.projectSubpath": "src",
+  "azureFunctions.deploySubpath": "src",
+  "azureFunctions.scmDoBuildDuringDeployment": true,
+  "azureFunctions.pythonVenv": ".venv",
+  "azureFunctions.projectLanguage": "Python",
+  "azureFunctions.projectRuntime": "~4",
+  "debug.internalConsoleOptions": "neverOpen",
+  "azureFunctions.projectLanguageModel": 2
+}
