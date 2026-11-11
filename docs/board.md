@@ -56,8 +56,8 @@ A Jira-style view of every step needed to finish the project. Update the **Statu
 
 | ID | Task | Status | Done when |
 |---|---|---|---|
-| API-1 | Functions project skeleton in `src/` | ⬜ | `func start` runs; `GET /api/health` returns 200 locally |
-| API-2 | Core logic: menu, validation, status rules | ⬜ | Unit tests pass (`pytest`) |
+| API-1 | Functions project skeleton in `src/` | ✅ | `func start` runs; `GET /api/health` returns 200 locally |
+| API-2 | Core logic: menu, validation, status rules | ✅ | Unit tests pass (`pytest`) |
 | API-3 | `SubmitOrder` (POST) | ⬜ | Order saved in Azurite table + message in `notify` queue; bad input → 400 |
 | API-4 | `GetOrderStatus` (GET) | ⬜ | Returns status, never email; unknown id → 404 |
 | API-5 | `UpdateOrderStatus` (PUT) | ⬜ | Needs function key; next status only, else 409; ETag check |
