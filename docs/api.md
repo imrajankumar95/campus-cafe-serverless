@@ -118,18 +118,19 @@ Every error uses the same shape. The frontend shows `message` to the user.
 
 ## Queue message — `notify`
 
-Sent by `SubmitOrder` and `UpdateOrderStatus`, consumed by `SendNotification`. Plain JSON (`host.json` sets `messageEncoding: "none"`).
+Sent by `SubmitOrder` and `UpdateOrderStatus` (via queue output bindings), consumed by the **Logic App email workflow** (see `adr/0001-cloud-first-design.md`). Plain JSON (`host.json` sets `messageEncoding: "none"`).
 
 ```json
 { "orderId": "3f0c2a8e-6a1b-4c39-9e4b-2b7f0f1c9d11", "status": "Preparing", "rank": 2 }
 ```
 
-`SendNotification` rules:
+Logic App rules:
 
-- Order already past this rank → skip, log `skipped-outdated`.
-- Flag for this status already `sent` → skip, log `skipped-duplicate`.
-- Otherwise claim the flag (`pending → sending`) with an ETag check, send the email, set `sent`.
-- Send fails → raise → queue retries 5 times → `notify-poison`.
+- Status `Collected` → no email.
+- Read the order row (by `orderId`) to get the email address.
+- Send the matching email through Communication Services.
+- Send fails → Logic App retry policy → run marked failed → alert. Messages that keep failing go to `notify-poison`.
+- A rare duplicate email is accepted (queues deliver at least once).
 
 ## Table — `orders`
 

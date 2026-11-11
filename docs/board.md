@@ -58,13 +58,27 @@ A Jira-style view of every step needed to finish the project. Update the **Statu
 |---|---|---|---|
 | API-1 | Functions project skeleton in `src/` | ✅ | `func start` runs; `GET /api/health` returns 200 locally |
 | API-2 | Core logic: menu, validation, status rules | ✅ | Unit tests pass (`pytest`) |
-| API-3 | `SubmitOrder` (POST) | ⬜ | Order saved in Azurite table + message in `notify` queue; bad input → 400 |
-| API-4 | `GetOrderStatus` (GET) | ⬜ | Returns status, never email; unknown id → 404 |
-| API-5 | `UpdateOrderStatus` (PUT) | ⬜ | Needs function key; next status only, else 409; ETag check |
-| API-6 | `SendNotification` (queue) | ⬜ | One email per status; duplicates + outdated skipped; `EMAIL_MODE=log` works |
-| API-7 | Real email via ACS + managed identity | ⬜ | Email arrives for Accepted, Preparing, Ready |
+| API-3 | `SubmitOrder` (POST) using **Table + Queue output bindings** (no storage SDK code) | ⬜ | Order saved in table + message in `notify` queue; bad input → 400 |
+| API-4 | `GetOrderStatus` (GET) using a **Table input binding** | ⬜ | Returns status, never email; unknown id → 404 |
+| API-5 | `UpdateOrderStatus` (PUT) | ⬜ | Needs function key; next status only, else 409; message queued |
+| ~~API-6~~ | ~~`SendNotification` function~~ | — | Replaced by Logic App (CLD-7), see ADR-0001 |
 
-## E5 · Infrastructure as code (S1)
+## E4b · Azure infrastructure, built in the portal (S1) — the core of the project
+
+| ID | Task | Status | Done when |
+|---|---|---|---|
+| CLD-1 | Storage account: table `orders`, queues `notify` + `notify-poison`; HTTPS only, TLS 1.2, no public blob access | ⬜ | Visible in portal; screenshot in `evidence/sprint-1/` |
+| CLD-2 | Log Analytics workspace + Application Insights (workspace-based) | ⬜ | Both created, daily cap set |
+| CLD-3 | Function App: Flex Consumption, Python 3.12, linked to App Insights | ⬜ | `/api/health` returns 200 on the Azure URL |
+| CLD-4 | User-assigned managed identity + role assignments (Storage Blob Data Owner, Queue Data Contributor, Table Data Contributor) | ⬜ | IAM blade shows the 3 roles on the storage account |
+| CLD-5 | App settings: identity-based storage connection (no keys), `EMAIL_SENDER` | ⬜ | Environment variables blade shows no connection strings |
+| CLD-6 | Deploy function code (VS Code Azure panel → Deploy) | ⬜ | Real order saved in Azure table |
+| CLD-7 | **Logic App email workflow** (designer UI): queue trigger → read order → ACS send email | ⬜ | Email arrives for Accepted, Preparing, Ready |
+| CLD-8 | Static Web Apps hosts `frontend/` + CORS on Function App | ⬜ | Order placed from the public URL |
+| CLD-9 | **Walking skeleton in Azure** | ⬜ | Browser order → table row → queue → Logic App → email |
+| CLD-10 | Storage: disable shared-key access once everything uses identity | ⬜ | App still works with keys off |
+
+## E5 · Infrastructure as code (S1–S2, teammate) — Bicep version of E4b
 
 | ID | Task | Status | Done when |
 |---|---|---|---|
