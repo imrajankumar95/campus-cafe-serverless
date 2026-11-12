@@ -18,6 +18,7 @@ Customers order online and get an email each time staff move the order forward: 
 
 - Design proposal and diagrams: [docs/design](docs/design)
 - How the project is run (sprints, backlog, Definition of Done): [docs/project-management.md](docs/project-management.md)
+- Local API and Azure deployment steps: [docs/deployment.md](docs/deployment.md)
 
 ## Repository layout
 

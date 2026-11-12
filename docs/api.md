@@ -6,6 +6,24 @@ The agreement between the frontend, the Function App and the background worker. 
 - **Format:** JSON in, JSON out. `Content-Type: application/json`
 - **Max request body:** 4 KB
 
+## Deployment contract
+
+The infrastructure and Function App must use these shared names and settings:
+
+| Item | Contract |
+|---|---|
+| Storage account | `pavanreddysa` by default; set Bicep parameter `accountName` to another globally unique name if needed. Azure names are lowercase. The deployment outputs `storageAccountName`. |
+| Table | `orders` |
+| Queues | `notify` and `notify-poison`; the queue trigger listens to `notify` |
+| Python | 3.12 |
+| Function App setting | `AzureWebJobsStorage__accountName` = `storageAccountName` output |
+| Function App setting | `AzureWebJobsStorage__credential` = `managedidentity` |
+| Function App setting | `AzureWebJobsStorage__clientId` and `AZURE_CLIENT_ID` = user-assigned managed identity client ID |
+| Function App setting | `EMAIL_MODE` = `log` for development or `acs` for Azure Communication Services |
+| Function App setting | `ACS_ENDPOINT` and `EMAIL_SENDER` = ACS values in `acs` mode; empty in `log` mode |
+
+Storage access uses the managed identity; do not add storage connection strings or account keys. The Function App's identity and required data-plane role assignments are provisioned separately.
+
 ## Order statuses
 
 | Rank | Status | Who sets it | Email sent |

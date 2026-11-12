@@ -1,5 +1,5 @@
-// Where the Function App lives. Leave empty to run the page in demo mode
-// (orders are not sent anywhere). Example: "https://func-campus-cafe-rk.azurewebsites.net"
+// Set to "http://localhost:7071" for local Functions, or to the deployed
+// Function App URL. Leave empty for demo mode (orders are not sent anywhere).
 window.CAFE_CONFIG = {
-  apiBaseUrl: ""
+  apiBaseUrl: "https://pavanreddyapp.azurewebsites.net"
 };
