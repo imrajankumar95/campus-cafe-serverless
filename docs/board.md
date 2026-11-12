@@ -38,7 +38,7 @@ A Jira-style view of every step needed to finish the project. Update the **Statu
 | REPO-1 | Create repo + skeleton | ✅ | `campus-cafe-serverless` public on GitHub |
 | REPO-2 | Git identity = imrajankumar95 | ✅ | Commits show imrajankumar95 |
 | REPO-3 | Merge settings (squash only, auto-delete branches) | 🔄 | Settings → General saved |
-| REPO-4 | Ruleset on `main` (PR + 1 approval) | ⬜ | Direct push to `main` is rejected |
+| REPO-4 | Ruleset on `main` (PR + 1 approval) | ✅ | Direct push to `main` is rejected (proved: it blocked Azure's direct workflow commit, 409) |
 | REPO-5 | Invite 4 teammates | 🔄 | 4 collaborators accepted |
 | REPO-6 | Decision records (ADRs) | ⬜ | 4 files in `docs/adr/` |
 | REPO-7 | API contract | 🔄 | `docs/api.md` merged |
@@ -49,7 +49,7 @@ A Jira-style view of every step needed to finish the project. Update the **Statu
 |---|---|---|---|
 | WEB-1 | Home, Menu, Order pages | ✅ | PR #1 + #2 merged |
 | WEB-2 | Connect to real API | ⬜ | `config.js` points at Function App; order placed from browser |
-| WEB-3 | Host on Static Web Apps | ⬜ | Public URL works; API CORS allows only that URL |
+| WEB-3 | Host on Static Web Apps | ✅ | Public URL works (see CLD-8; CORS tracked in CLD-8b) |
 | WEB-4 | Staff page (move order to next status) | ⬜ | Staff can advance an order from the browser |
 
 ## E4 · Backend core (S1)
@@ -74,7 +74,8 @@ A Jira-style view of every step needed to finish the project. Update the **Statu
 | CLD-5 | App settings: identity-based storage connection (no keys), `EMAIL_SENDER` | ⬜ | Environment variables blade shows no connection strings |
 | CLD-6 | Deploy function code (VS Code Azure panel → Deploy) | ✅ | Real order saved in Azure table |
 | CLD-7 | **Logic App email workflow** (designer UI): queue trigger → read order → ACS send email | ⬜ | Email arrives for Accepted, Preparing, Ready |
-| CLD-8 | Static Web Apps hosts `frontend/` + CORS on Function App | ⬜ | Order placed from the public URL |
+| CLD-8 | Static Web Apps hosts `frontend/` via GitHub Actions (GitHub OIDC, no stored token) | ✅ | Live at https://mango-beach-0a485860f.5.azurestaticapps.net; Actions run green |
+| CLD-8b | CORS on Function App allows only the Static Web Apps URL | ⬜ | Order placed from the public URL |
 | CLD-9 | **Walking skeleton in Azure** | ⬜ | Browser order → table row → queue → Logic App → email |
 | CLD-10 | Storage: disable shared-key access once everything uses identity | ⬜ | App still works with keys off |
 
