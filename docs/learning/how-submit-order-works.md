@@ -107,3 +107,27 @@ Only the connection setting changes between environments. The code does not.
 | Valid order (2 latte + 1 croissant) | `202`, total `12.15` | ✅ `202`, `12.15` |
 | `qty: 0` | `400`, quantity message | ✅ `400` "Quantity must be between 1 and 10." |
 | Table and queue | Created by bindings | ✅ `orders` and `notify` appeared in Azurite |
+
+## 9. Reading it back: `GetOrderStatus` (API-4)
+
+`GET /api/orders/{orderId}` uses a **table input binding**, the reverse of an output binding.
+
+```python
+@app.route(route="orders/{orderId}", methods=["GET"])
+@app.table_input(arg_name="row", connection="OrdersStorage", table_name="orders",
+                 partition_key="{orderId}", row_key="order")
+```
+
+- `{orderId}` in the route is a placeholder filled from the URL.
+- **Before** the code runs, the host looks up the row with that `PartitionKey` and `RowKey = "order"` and passes it in as `row`.
+- The response returns 5 fields only. `email` and `itemsJson` are never returned.
+
+**Bug found while testing:** the first run returned `500`. The `func start` log showed `TypeError: list indices must be integers or slices, not str`. The binding returns the row **wrapped in a JSON array** (`[{...}]`), and `"[]"` when nothing matches. Fix: parse the text, wrap a single object in a list, return `404` if the list is empty, otherwise use `rows[0]`.
+
+**Lesson:** a `500` on the client is only the symptom. The cause is in the server log. Never assume a binding's data shape.
+
+| Test | Expected | Result |
+|---|---|---|
+| Existing order ID | `200`, status `Accepted`, no email | ✅ |
+| Valid GUID, no such order | `404` | ✅ |
+| `abc` (not a GUID) | `400` | ✅ |

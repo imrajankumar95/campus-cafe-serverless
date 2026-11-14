@@ -51,3 +51,28 @@ def submit_order(req: func.HttpRequest, order_row: func.Out[str], notify_msg: fu
     notify_msg.set(json.dumps({"orderId": order_id, "status": "Accepted", "rank": 1}))
 
     return json_response(202, {"orderId": order_id, "status": "Accepted", "total": total})
+
+@app.route(route="orders/{orderId}", methods=["GET"])
+@app.table_input(arg_name="row", connection="OrdersStorage", table_name="orders",
+                 partition_key="{orderId}", row_key="order")
+def get_order_status(req: func.HttpRequest, row: str) -> func.HttpResponse:
+    order_id = req.route_params.get("orderId")
+    try:
+        uuid.UUID(order_id)
+    except ValueError:
+        return json_response(400, {"code": "validation_error", "message": "Order ID must be a GUID."})
+
+    rows = json.loads(row) if row else []
+    if isinstance(rows, dict):
+        rows = [rows]
+    if not rows:
+        return json_response(404, {"code": "not_found", "message": "Order not found."})
+
+    order = rows[0]
+    return json_response(200, {
+        "orderId": order_id,
+        "status": order["status"],
+        "pickupName": order["pickupName"],
+        "createdAt": order["createdAt"],
+        "updatedAt": order["updatedAt"],
+    })
