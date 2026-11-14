@@ -58,7 +58,7 @@ A Jira-style view of every step needed to finish the project. Update the **Statu
 |---|---|---|---|
 | API-1 | Functions project skeleton in `src/` | ✅ | `func start` runs; `GET /api/health` returns 200 locally |
 | API-2 | Core logic: menu, validation, status rules | ✅ | Unit tests pass (`pytest`) |
-| API-3 | `SubmitOrder` (POST) using **Table + Queue output bindings** (no storage SDK code) | ⬜ | Order saved in table + message in `notify` queue; bad input → 400 |
+| API-3 | `SubmitOrder` (POST) using **Table + Queue output bindings** (no storage SDK code) | ✅ | Order saved in table + message in `notify` queue; bad input → 400 (proved locally on Azurite; Azure run in CLD-9). See `docs/learning/how-submit-order-works.md` |
 | API-4 | `GetOrderStatus` (GET) using a **Table input binding** | ⬜ | Returns status, never email; unknown id → 404 |
 | API-5 | `UpdateOrderStatus` (PUT) | ⬜ | Needs function key; next status only, else 409; message queued |
 | ~~API-6~~ | ~~`SendNotification` function~~ | — | Replaced by Logic App (CLD-7), see ADR-0001 |
