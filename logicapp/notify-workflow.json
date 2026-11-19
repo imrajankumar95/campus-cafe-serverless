@@ -1,0 +1,174 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "triggers": {
+            "When_there_are_messages_in_a_queue_(V2)": {
+                "type": "ApiConnection",
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['azurequeues']['connectionId']"
+                        }
+                    },
+                    "method": "get",
+                    "path": "/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent('<STORAGE_ACCOUNT>'))}/queues/@{encodeURIComponent('notify')}/message_trigger"
+                },
+                "recurrence": {
+                    "interval": 3,
+                    "frequency": "Minute",
+                    "timeZone": "Eastern Standard Time"
+                },
+                "splitOn": "@triggerBody()?['QueueMessagesList']?['QueueMessage']"
+            }
+        },
+        "actions": {
+            "Parse_JSON": {
+                "type": "ParseJson",
+                "inputs": {
+                    "content": "@triggerBody()?['MessageText']",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "orderId": { "type": "string" },
+                            "status": {
+                                "type": "string",
+                                "enum": ["Accepted", "Preparing", "Ready", "Collected"]
+                            },
+                            "rank": { "type": "integer", "minimum": 1, "maximum": 4 }
+                        },
+                        "required": ["orderId", "status", "rank"]
+                    }
+                },
+                "runAfter": {}
+            },
+            "Condition": {
+                "type": "If",
+                "expression": {
+                    "and": [
+                        { "not": { "equals": ["@body('Parse_JSON')['status']", "Collected"] } }
+                    ]
+                },
+                "actions": {
+                    "Get_entity_(V2)": {
+                        "type": "ApiConnection",
+                        "inputs": {
+                            "host": {
+                                "connection": {
+                                    "name": "@parameters('$connections')['azuretables']['connectionId']"
+                                }
+                            },
+                            "method": "get",
+                            "path": "/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent('<STORAGE_ACCOUNT>'))}/tables/@{encodeURIComponent('orders')}/entities(PartitionKey='@{encodeURIComponent(body('Parse_JSON')['orderId'])}',RowKey='@{encodeURIComponent('order')}')",
+                            "queries": { "$select": "email,pickupName" }
+                        }
+                    },
+                    "HTTP": {
+                        "type": "Http",
+                        "inputs": {
+                            "uri": "https://<ACS_ENDPOINT_HOST>/emails:send?api-version=2023-03-31",
+                            "method": "POST",
+                            "headers": { "Content-Type": "application/json" },
+                            "body": {
+                                "senderAddress": "<SENDER_ADDRESS>",
+                                "content": {
+                                    "subject": "Campus Café order update: @{body('Parse_JSON')['status']}",
+                                    "plainText": "Hi @{body('Get_entity_(V2)')?['pickupName']}, your order @{body('Parse_JSON')['orderId']} is now @{body('Parse_JSON')['status']}."
+                                },
+                                "recipients": {
+                                    "to": [ { "address": "@{body('Get_entity_(V2)')?['email']}" } ]
+                                }
+                            },
+                            "authentication": {
+                                "type": "ManagedServiceIdentity",
+                                "audience": "https://communication.azure.com"
+                            },
+                            "retryPolicy": { "type": "fixed", "count": 2, "interval": "PT5S" }
+                        },
+                        "runAfter": { "Get_entity_(V2)": ["Succeeded"] }
+                    }
+                },
+                "else": { "actions": {} },
+                "runAfter": { "Parse_JSON": ["Succeeded"] }
+            },
+            "Delete_message_-_done": {
+                "type": "ApiConnection",
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['azurequeues']['connectionId']"
+                        }
+                    },
+                    "method": "delete",
+                    "path": "/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent('<STORAGE_ACCOUNT>'))}/queues/@{encodeURIComponent('notify')}/messages/@{encodeURIComponent(triggerBody()?['MessageId'])}",
+                    "queries": { "popreceipt": "@triggerBody()?['PopReceipt']" }
+                },
+                "runAfter": { "Condition": ["Succeeded"] }
+            },
+            "Check_retries": {
+                "type": "If",
+                "expression": {
+                    "and": [
+                        { "greaterOrEquals": ["@int(triggerBody()?['DequeueCount'])", 5] }
+                    ]
+                },
+                "actions": {
+                    "Put_a_message_on_a_queue_(V2)": {
+                        "type": "ApiConnection",
+                        "inputs": {
+                            "host": {
+                                "connection": {
+                                    "name": "@parameters('$connections')['azurequeues']['connectionId']"
+                                }
+                            },
+                            "method": "post",
+                            "body": "@triggerBody()?['MessageText']",
+                            "path": "/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent('<STORAGE_ACCOUNT>'))}/queues/@{encodeURIComponent('notify-poison')}/messages"
+                        }
+                    },
+                    "Delete_message_-_poison": {
+                        "type": "ApiConnection",
+                        "inputs": {
+                            "host": {
+                                "connection": {
+                                    "name": "@parameters('$connections')['azurequeues']['connectionId']"
+                                }
+                            },
+                            "method": "delete",
+                            "path": "/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent('<STORAGE_ACCOUNT>'))}/queues/@{encodeURIComponent('notify')}/messages/@{encodeURIComponent(triggerBody()?['MessageId'])}",
+                            "queries": { "popreceipt": "@triggerBody()?['PopReceipt']" }
+                        },
+                        "runAfter": { "Put_a_message_on_a_queue_(V2)": ["Succeeded"] }
+                    },
+                    "Terminate_-_moved_to_poison": {
+                        "type": "Terminate",
+                        "inputs": {
+                            "runStatus": "Failed",
+                            "runError": {
+                                "code": "MovedToPoison",
+                                "message": "Order notify failed after retries; moved to notify-poison"
+                            }
+                        },
+                        "runAfter": { "Delete_message_-_poison": ["Succeeded"] }
+                    }
+                },
+                "else": {
+                    "actions": {
+                        "Terminate_-_will_retry": {
+                            "type": "Terminate",
+                            "inputs": {
+                                "runStatus": "Failed",
+                                "runError": { "code": "WillRetry" }
+                            }
+                        }
+                    }
+                },
+                "runAfter": { "Condition": ["Failed", "Skipped", "TimedOut"] }
+            }
+        },
+        "outputs": {},
+        "parameters": {
+            "$connections": { "type": "Object", "defaultValue": {} }
+        }
+    }
+}
