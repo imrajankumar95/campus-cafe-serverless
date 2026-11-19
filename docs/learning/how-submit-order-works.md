@@ -131,3 +131,36 @@ Only the connection setting changes between environments. The code does not.
 | Existing order ID | `200`, status `Accepted`, no email | ✅ |
 | Valid GUID, no such order | `404` | ✅ |
 | `abc` (not a GUID) | `400` | ✅ |
+
+## 10. Moving an order forward: `UpdateOrderStatus` (API-5)
+
+`PUT /api/orders/{orderId}/status` with body `{"status": "Preparing"}`. Staff only: `auth_level=func.AuthLevel.FUNCTION` means callers need the `x-functions-key` header in Azure (not enforced when running locally).
+
+**Design constraint found in the docs:** the table output binding can only **create** rows, never update one. So instead of editing the order row, each move **adds** a status row:
+
+| RowKey | Holds |
+|---|---|
+| `order` | Name, email, items, initial status `Accepted` |
+| `status-2` | `Preparing` + time |
+| `status-3` | `Ready` + time |
+| `status-4` | `Collected` + time |
+
+The function uses **three bindings**:
+- `table_input` with only `partition_key` (no `row_key`) → every row of the order.
+- `table_output` → adds one `status-<rank>` row.
+- `queue_output` → a `notify` message, so the Logic App emails the student with no change on its side.
+
+Checks, in order: valid GUID → valid JSON body → known status (`400`) → order exists (`404`) → exactly one step forward from the highest-rank row (`409`) → write.
+
+`GetOrderStatus` changed too: it now reads the whole partition, takes name and created time from the `order` row, and the status from the highest-rank row.
+
+**Bonus:** a full audit trail, and safe concurrency (two staff writing the same `status-2` → only one insert succeeds).
+
+**Bug on the way:** the GET decorator said `arg_name="rows"` but the parameter was still `row`. The binding name **must** match the parameter name.
+
+| Test | Expected | Result |
+|---|---|---|
+| Accepted → Preparing | `200` | ✅ |
+| Preparing → Collected (skips Ready) | `409` | ✅ |
+| Status `Hacked` | `400` | ✅ |
+| GET after the move | `200`, status `Preparing` | ✅ |
