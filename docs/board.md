@@ -73,7 +73,7 @@ A Jira-style view of every step needed to finish the project. Update the **Statu
 | CLD-4 | User-assigned managed identity + role assignments (Storage Blob Data Owner, Queue Data Contributor, Table Data Contributor) | ✅ | IAM blade shows the 3 roles on the storage account |
 | CLD-5 | App settings: identity-based storage connection (no keys), `EMAIL_SENDER` | ⬜ | Environment variables blade shows no connection strings |
 | CLD-6 | Deploy function code (VS Code Azure panel → Deploy) | ✅ | Real order saved in Azure table |
-| CLD-7 | **Logic App email workflow** (designer UI): queue trigger → read order → ACS send email | ⬜ | Email arrives for Accepted, Preparing, Ready |
+| CLD-7 | **Logic App email workflow** (designer UI): queue trigger → read order → ACS send email | ✅ | Email arrives for Accepted, Preparing, Ready; Collected skipped; failing messages move to `notify-poison` after 5 tries (evidence `evidence/sprint-1/cld7-*`) |
 | CLD-8 | Static Web Apps hosts `frontend/` via GitHub Actions (GitHub OIDC, no stored token) | ✅ | Live at https://mango-beach-0a485860f.5.azurestaticapps.net; Actions run green |
 | CLD-8b | CORS on Function App allows only the Static Web Apps URL | ⬜ | Order placed from the public URL |
 | CLD-9 | **Walking skeleton in Azure** | ⬜ | Browser order → table row → queue → Logic App → email |
