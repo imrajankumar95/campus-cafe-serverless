@@ -90,9 +90,15 @@ Request:
 { "status": "Preparing" }
 ```
 
-Response `200 OK`: same body as `GET`.
+Response `200 OK`:
 
-Errors: `400` (unknown status), `401` (missing/wrong key), `404` (no such order), `409` (not the next status, or another update won the race).
+```json
+{ "orderId": "3f0c2a8e-6a1b-4c39-9e4b-2b7f0f1c9d11", "status": "Preparing", "updatedAt": "2026-11-11T14:05:40Z" }
+```
+
+Errors: `400` (not a GUID, bad body or unknown status), `401` (missing/wrong key), `404` (no such order), `409` (not the next status).
+
+Known limit: if two staff move the same order at the same moment, the second request returns `500` instead of `409`. The data stays correct, because only one `status-<rank>` row can exist (see the table section).
 
 ### `GET /api/health` — liveness
 
@@ -134,6 +140,10 @@ Logic App rules:
 
 ## Table — `orders`
 
+One partition per order (`PartitionKey` = orderId). Rows are **only ever added, never updated**: the Functions table output binding can only create new entities, so each status change adds a row. This also gives a free audit trail.
+
+**Order row** (`RowKey = order`), written once by `SubmitOrder`:
+
 | Field | Example | Notes |
 |---|---|---|
 | `PartitionKey` | `3f0c2a8e-…` | The orderId |
@@ -142,8 +152,17 @@ Logic App rules:
 | `email` | `sam@georgebrown.ca` | Only personal data. Never logged, never returned |
 | `itemsJson` | `[{"id":"latte","qty":2}]` | Table Storage has no arrays, so stored as a JSON string |
 | `total` | `12.15` | Server-calculated |
-| `status` / `statusRank` | `Preparing` / `2` | |
-| `notifyAccepted` / `notifyPreparing` / `notifyReady` | `pending` · `sending` · `sent` | Exactly-once email flags |
+| `status` / `statusRank` | `Accepted` / `1` | Initial status only |
 | `createdAt` / `updatedAt` | ISO 8601 UTC | |
 
-ETag (built into Table Storage) is used on every update so two writers can't overwrite each other.
+**Status rows** (`RowKey = status-<rank>`), one per staff move by `UpdateOrderStatus`:
+
+| Field | Example |
+|---|---|
+| `RowKey` | `status-2` |
+| `status` / `statusRank` | `Preparing` / `2` |
+| `updatedAt` | ISO 8601 UTC |
+
+**Current status** = the row with the highest `statusRank` in the partition. `GetOrderStatus` reads the whole partition and picks it.
+
+**Concurrency:** two writers moving the same order both try to insert the same `status-<rank>` row. Table Storage allows only one, so the second write fails and no status is skipped or duplicated.
