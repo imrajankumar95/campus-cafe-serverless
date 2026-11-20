@@ -9,7 +9,7 @@ A Jira-style view of every step needed to finish the project. Update the **Statu
 | Sprint | Dates | Goal | Status |
 |---|---|---|---|
 | S0 Setup | Nov 3–10 | Account, repo, tools, email, frontend | ✅ Mostly done |
-| S1 Build | Nov 11–15 | Backend working locally, then in Azure with real email | 🔄 Started |
+| S1 Build | Nov 11–19 | Backend working locally, then in Azure with real email | ✅ API + email chain proven in Azure (Nov 19); browser order pending merge of WEB-2 |
 | S2 Harden + release | Nov 16–20 | CI/CD, security, monitoring, tests, `v1.0.0` | ⬜ |
 | UAT | ~Nov 21 | Submit to professor for feedback | ⬜ |
 | S3 Iterate | Nov 22–Dec 12 | Feedback fixes, stretch items, demo video | ⬜ |
@@ -48,7 +48,7 @@ A Jira-style view of every step needed to finish the project. Update the **Statu
 | ID | Task | Status | Done when |
 |---|---|---|---|
 | WEB-1 | Home, Menu, Order pages | ✅ | PR #1 + #2 merged |
-| WEB-2 | Connect to real API | ⬜ | `config.js` points at Function App; order placed from browser |
+| WEB-2 | Connect to real API | 🔄 `config.js` set (PR open) | `config.js` points at Function App; order placed from browser |
 | WEB-3 | Host on Static Web Apps | ✅ | Public URL works (see CLD-8; CORS tracked in CLD-8b) |
 | WEB-4 | Staff page (move order to next status) | ⬜ | Staff can advance an order from the browser |
 
@@ -60,7 +60,7 @@ A Jira-style view of every step needed to finish the project. Update the **Statu
 | API-2 | Core logic: menu, validation, status rules | ✅ | Unit tests pass (`pytest`) |
 | API-3 | `SubmitOrder` (POST) using **Table + Queue output bindings** (no storage SDK code) | ✅ | Order saved in table + message in `notify` queue; bad input → 400 (proved locally on Azurite; Azure run in CLD-9). See `docs/learning/how-submit-order-works.md` |
 | API-4 | `GetOrderStatus` (GET) using a **Table input binding** | ✅ | Returns status, never email; unknown id → 404 |
-| API-5 | `UpdateOrderStatus` (PUT) | ✅ | Needs function key; next status only, else 409; message queued (append-only status rows, tested locally) |
+| API-5 | `UpdateOrderStatus` (PUT) | ✅ | Needs function key; next status only, else 409; message queued (append-only status rows; tested locally and in Azure: no key → 401) |
 | ~~API-6~~ | ~~`SendNotification` function~~ | — | Replaced by Logic App (CLD-7), see ADR-0001 |
 
 ## E4b · Azure infrastructure, built in the portal (S1) — the core of the project
@@ -71,12 +71,12 @@ A Jira-style view of every step needed to finish the project. Update the **Statu
 | CLD-2 | Log Analytics workspace + Application Insights (workspace-based) | ✅ | Both created, daily cap set |
 | CLD-3 | Function App: Flex Consumption, Python 3.12, linked to App Insights | ✅ | `/api/health` returns 200 on the Azure URL |
 | CLD-4 | User-assigned managed identity + role assignments (Storage Blob Data Owner, Queue Data Contributor, Table Data Contributor) | ✅ | IAM blade shows the 3 roles on the storage account |
-| CLD-5 | App settings: identity-based storage connection (no keys), `EMAIL_SENDER` | ⬜ | Environment variables blade shows no connection strings |
-| CLD-6 | Deploy function code (VS Code Azure panel → Deploy) | ✅ | Real order saved in Azure table |
+| CLD-5 | App settings: identity-based storage connection (no keys) | ✅ | `OrdersStorage__queueServiceUri` / `__tableServiceUri` / `__credential` / `__clientId`; no connection strings (`EMAIL_SENDER` not needed: the Logic App sends email) |
+| CLD-6 | Deploy function code (VS Code Azure panel → Deploy) | ✅ | 4 functions live; real order saved in Azure table (Nov 19) |
 | CLD-7 | **Logic App email workflow** (designer UI): queue trigger → read order → ACS send email | ✅ | Email arrives for Accepted, Preparing, Ready; Collected skipped; failing messages move to `notify-poison` after 5 tries (evidence `evidence/sprint-1/cld7-*`) |
 | CLD-8 | Static Web Apps hosts `frontend/` via GitHub Actions (GitHub OIDC, no stored token) | ✅ | Live at https://mango-beach-0a485860f.5.azurestaticapps.net; Actions run green |
-| CLD-8b | CORS on Function App allows only the Static Web Apps URL | ⬜ | Order placed from the public URL |
-| CLD-9 | **Walking skeleton in Azure** | ⬜ | Browser order → table row → queue → Logic App → email |
+| CLD-8b | CORS on Function App allows only the Static Web Apps URL | 🔄 Configured (SWA URL + portal for testing; credentials off) | Order placed from the public URL |
+| CLD-9 | **Walking skeleton in Azure** | 🔄 curl → table → queue → Logic App → email proven (Nov 19); browser step pending WEB-2 | Browser order → table row → queue → Logic App → email |
 | CLD-10 | Storage: disable shared-key access once everything uses identity | ⬜ | App still works with keys off |
 
 ## E5 · Infrastructure as code (S1–S2, teammate) — Bicep version of E4b
