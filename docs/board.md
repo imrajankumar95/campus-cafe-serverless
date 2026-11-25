@@ -9,7 +9,7 @@ A Jira-style view of every step needed to finish the project. Update the **Statu
 | Sprint | Dates | Goal | Status |
 |---|---|---|---|
 | S0 Setup | Nov 3–10 | Account, repo, tools, email, frontend | ✅ Mostly done |
-| S1 Build | Nov 11–19 | Backend working locally, then in Azure with real email | ✅ API + email chain proven in Azure (Nov 19); browser order pending merge of WEB-2 |
+| S1 Build | Nov 11–25 | Backend working locally, then in Azure with real email | ✅ Browser order → email works end to end in Azure (Nov 25) |
 | S2 Harden + release | Nov 16–20 | CI/CD, security, monitoring, tests, `v1.0.0` | ⬜ |
 | UAT | ~Nov 21 | Submit to professor for feedback | ⬜ |
 | S3 Iterate | Nov 22–Dec 12 | Feedback fixes, stretch items, demo video | ⬜ |
@@ -48,7 +48,7 @@ A Jira-style view of every step needed to finish the project. Update the **Statu
 | ID | Task | Status | Done when |
 |---|---|---|---|
 | WEB-1 | Home, Menu, Order pages | ✅ | PR #1 + #2 merged |
-| WEB-2 | Connect to real API | 🔄 `config.js` set (PR open) | `config.js` points at Function App; order placed from browser |
+| WEB-2 | Connect to real API | ✅ | `config.js` points at Function App; order placed from browser |
 | WEB-3 | Host on Static Web Apps | ✅ | Public URL works (see CLD-8; CORS tracked in CLD-8b) |
 | WEB-4 | Staff page (move order to next status) | ⬜ | Staff can advance an order from the browser |
 
@@ -75,9 +75,9 @@ A Jira-style view of every step needed to finish the project. Update the **Statu
 | CLD-6 | Deploy function code (VS Code Azure panel → Deploy) | ✅ | 4 functions live; real order saved in Azure table (Nov 19) |
 | CLD-7 | **Logic App email workflow** (designer UI): queue trigger → read order → ACS send email | ✅ | Email arrives for Accepted, Preparing, Ready; Collected skipped; failing messages move to `notify-poison` after 5 tries (evidence `evidence/sprint-1/cld7-*`) |
 | CLD-8 | Static Web Apps hosts `frontend/` via GitHub Actions (GitHub OIDC, no stored token) | ✅ | Live at https://mango-beach-0a485860f.5.azurestaticapps.net; Actions run green |
-| CLD-8b | CORS on Function App allows only the Static Web Apps URL | 🔄 Configured (SWA URL + portal for testing; credentials off) | Order placed from the public URL |
-| CLD-9 | **Walking skeleton in Azure** | 🔄 curl → table → queue → Logic App → email proven (Nov 19); browser step pending WEB-2 | Browser order → table row → queue → Logic App → email |
-| CLD-10 | Storage: disable shared-key access once everything uses identity | ⬜ | App still works with keys off |
+| CLD-8b | CORS on Function App allows only the Static Web Apps URL | ✅ | Order placed from the public URL (Nov 25) |
+| CLD-9 | **Walking skeleton in Azure** | ✅ | Browser order → table row → queue → Logic App → email (Nov 25, evidence `cld9-*`) |
+| CLD-10 | Storage: disable shared-key access once everything uses identity | ✅ | App still works with keys off (browser order → email, Nov 25) |
 
 ## E5 · Infrastructure as code (S1–S2, teammate) — Bicep version of E4b
 
@@ -102,9 +102,9 @@ A Jira-style view of every step needed to finish the project. Update the **Statu
 
 | ID | Task | Status | Done when |
 |---|---|---|---|
-| SEC-1 | Input limits, email allow-list, escaped email templates | ⬜ | Bad input rejected; tests cover it |
-| SEC-2 | Keyless: storage shared-key off, HTTPS only, TLS 1.2 | ⬜ | Settings verified in portal |
-| SEC-3 | CORS locked to the frontend URL | ⬜ | Calls from other sites are blocked |
+| SEC-1 | Input limits, email allow-list, escaped email templates | ✅ | Bad input rejected; 21 unit tests; emails sent as plain text (no HTML injection) |
+| SEC-2 | Keyless: storage shared-key off, HTTPS only, TLS 1.2 | ✅ | Shared key disabled, TLS 1.2, anonymous blob access off; every service uses managed identity |
+| SEC-3 | CORS locked to the frontend URL | ✅ | Only the Static Web Apps URL allowed; credentials off; staff route needs a function key (no key → 401) |
 
 ## E8 · Monitoring (S2)
 
