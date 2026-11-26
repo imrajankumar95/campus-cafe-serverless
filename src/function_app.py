@@ -1,4 +1,5 @@
 import json
+import logging
 import uuid
 from datetime import datetime, timezone
 
@@ -56,6 +57,8 @@ def submit_order(req: func.HttpRequest, order_row: func.Out[str], notify_msg: fu
         "updatedAt": now,
     }))
     notify_msg.set(json.dumps({"orderId": order_id, "status": "Accepted", "rank": 1}))
+    
+    logging.info("order_submitted orderId=%s status=Accepted", order_id)
 
     return json_response(202, {"orderId": order_id, "status": "Accepted", "total": total})
 
@@ -76,6 +79,7 @@ def get_order_status(req: func.HttpRequest, rows: str) -> func.HttpResponse:
         return json_response(404, {"code": "not_found", "message": "Order not found."})
 
     latest = max(entities, key=lambda e: e.get("statusRank", 0))
+    logging.info("order_read orderId=%s status=%s", order_id, latest["status"])
     return json_response(200, {
         "orderId": order_id,
         "status": latest["status"],
@@ -124,5 +128,7 @@ def update_order_status(req: func.HttpRequest, rows: str,
         "updatedAt": now,
     }))
     notify_msg.set(json.dumps({"orderId": order_id, "status": target, "rank": rank}))
+    
+    logging.info("order_status_changed orderId=%s status=%s", order_id, target)
 
     return json_response(200, {"orderId": order_id, "status": target, "updatedAt": now})
