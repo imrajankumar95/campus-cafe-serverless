@@ -10,7 +10,7 @@ A Jira-style view of every step needed to finish the project. Update the **Statu
 |---|---|---|---|
 | S0 Setup | Nov 3–10 | Account, repo, tools, email, frontend | ✅ Mostly done |
 | S1 Build | Nov 11–25 | Backend working locally, then in Azure with real email | ✅ Browser order → email works end to end in Azure (Nov 25) |
-| S2 Harden + release | Nov 16–20 | CI/CD, security, monitoring, tests, `v1.0.0` | ⬜ |
+| S2 Harden + release | Nov 16–20 | CI/CD, security, monitoring, tests, `v1.0.0` | 🔄 Security ✅, monitoring nearly done; IaC + CI/CD next |
 | UAT | ~Nov 21 | Submit to professor for feedback | ⬜ |
 | S3 Iterate | Nov 22–Dec 12 | Feedback fixes, stretch items, demo video | ⬜ |
 
@@ -110,9 +110,9 @@ A Jira-style view of every step needed to finish the project. Update the **Statu
 
 | ID | Task | Status | Done when |
 |---|---|---|---|
-| OBS-1 | Logs carry `orderId`, never email | ⬜ | KQL query shows an order's full journey |
-| OBS-2 | Alerts: function failures, poison queue | ⬜ | Each alert fired once on purpose, email received |
-| OBS-3 | Dashboard (workbook) + availability test | ⬜ | Screenshot in `evidence/` |
+| OBS-1 | Logs carry `orderId`, never email | ✅ | KQL query shows an order's full journey: function log → Logic App steps → email in ~2.5 min (`evidence/sprint-2/obs-10-*`, query in `docs/monitoring.md`) |
+| OBS-2 | Alerts: function failures, failed email runs, poison queue | 🔄 | 3 rules + action group created (`obs-01..03`, `obs-07`); `alert-email-runs-failed` fired, emailed and resolved (Nov 25, `obs-08`, `obs-09`); `alert-api-failures` counts 5xx only (4xx = success in App Insights) |
+| OBS-3 | Dashboard (workbook) + availability test | 🔄 | Workbook `Campus Cafe Ops` saved (`obs-11`); availability test not done |
 
 ## E9 · Release v1.0.0 (S2)
 
